@@ -27,7 +27,11 @@ contract GpsSpotRegister {
 	function get_y(string __spotname) public view returns (int32){
 		return spot_list[stringToBytes32(__spotname)].y;
 	}
-	function get_spot(string __spotname) public view returns (int32, int32){
-		return (spot_list[stringToBytes32(__spotname)].x, spot_list[stringToBytes32(__spotname)].y);
+	function get_spot(string __spotname) public view returns (string, int32, int32){
+		bytes32 bytes_str = stringToBytes32(__spotname);
+		return (spot_list[bytes_str].name, spot_list[bytes_str].x, spot_list[bytes_str].y);
+	}
+	function get_spotlist() public view returns (bytes32[]){
+		return spotname_list;
 	}
 }
