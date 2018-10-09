@@ -1,13 +1,19 @@
 pragma solidity ^0.4.25;
+pragma experimental ABIEncoderV2;
 contract GpsSpotRegister {
 	struct Spot{
-		uint256 index;
 		string name;
 		int32 x;
 		int32 y;
 	}
-	mapping (bytes32 => Spot) public spot_list;
-	bytes32[] public spotname_list;
+	struct Demand{
+		uint64 reg_date;
+		uint64 est_date;
+		Spot dept;
+		Spot arrv;
+		uint8 passengers;
+	}
+	Demand[] demand_list ;
 	function stringToBytes32(string memory source) internal pure returns (bytes32 result) {
 		bytes memory tempEmptyStringTest = bytes(source);
 		if (tempEmptyStringTest.length == 0) {
@@ -17,23 +23,25 @@ contract GpsSpotRegister {
 			result := mload(add(source, 32))
 		}
 	}
-	function set(string __spotname, int32 _x, int32 _y) public returns (uint256){
-		bytes32 bytes_str = stringToBytes32(__spotname);
-		uint256 raw_index = spotname_list.push(bytes_str)-1;
-		spot_list[bytes_str] = Spot(raw_index, __spotname, _x, _y);
+	function set(uint8 __passengers, uint64 __reg_date, uint64 __est_date, string dept_name, int32 dept_x, int32 dept_y, string arrv_name, int32 arrv_x, int32 arrv_y) public returns (uint256){
+		uint256 raw_index = demand_list.push(Demand(__reg_date, __est_date, Spot(dept_name, dept_x, dept_y), Spot(arrv_name, arrv_x, arrv_y), __passengers)) -1;
 		return raw_index;
 	}
-	function get_x(string __spotname) public view returns (int32){
-		return spot_list[stringToBytes32(__spotname)].x;
+	function get_deptspot(uint __index) public view returns (string, int32, int32){
+		Spot spot = demand_list[__index].dept;
+		return (spot.name, spot.x, spot.y);
 	}
-	function get_y(string __spotname) public view returns (int32){
-		return spot_list[stringToBytes32(__spotname)].y;
+	function get_arrvspot(uint __index) public view returns (string, int32, int32){
+		Spot spot = demand_list[__index].arrv;
+                return (spot.name, spot.x, spot.y);
 	}
-	function get_spot(string __spotname) public view returns (uint256, string, int32, int32){
-		Spot target = spot_list[stringToBytes32(__spotname)];
-		return (target.index, target.name, target.x, target.y);
+	function get_demand(uint __index) public view returns (uint64, uint64, uint8, string, int32, int32, string, int32, int32){
+		Demand demand = demand_list[__index];
+		Spot dept_spot = demand.dept;
+		Spot arrv_spot = demand.arrv;
+		return (demand.reg_date, demand.est_date, demand.passengers, dept_spot.name, dept_spot.x, dept_spot.y, arrv_spot.name, arrv_spot.x, arrv_spot.y);
 	}
-	function get_spotlist() public view returns (bytes32[]){
-		return spotname_list;
+	function get_demandlist() public view returns (Demand[]){
+		return demand_list;
 	}
 }
