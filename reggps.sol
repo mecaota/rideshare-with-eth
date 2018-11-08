@@ -12,19 +12,11 @@ contract Demand_Controller {
 		Spot dept;
 		Spot arrv;
 		uint8 passengers;
+		address owner;
 	}
 	Demand[] demand_list ;
-	function stringToBytes32(string memory source) internal pure returns (bytes32 result) {
-		bytes memory tempEmptyStringTest = bytes(source);
-		if (tempEmptyStringTest.length == 0) {
-			return 0x0;
-		}
-		assembly {
-			result := mload(add(source, 32))
-		}
-	}
 	function set(uint8 __passengers, uint64 __reg_date, uint64 __est_date, string dept_name, int32 dept_x, int32 dept_y, string arrv_name, int32 arrv_x, int32 arrv_y) public returns (uint){
-		return demand_list.push(Demand(__reg_date, __est_date, Spot(dept_name, dept_x, dept_y), Spot(arrv_name, arrv_x, arrv_y), __passengers)) -1;
+		return demand_list.push(Demand(__reg_date, __est_date, Spot(dept_name, dept_x, dept_y), Spot(arrv_name, arrv_x, arrv_y), __passengers, msg.sender)) -1;
 	}
 	function get_deptspot(uint __index) public view returns (string, int32, int32){
 		Spot memory spot = demand_list[__index].dept;
